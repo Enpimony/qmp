@@ -3,13 +3,13 @@ const { Client } = require('pg');
 // La funció 'handler' és el punt d'entrada per a Netlify Functions
 exports.handler = async (event, context) => {
   // 1. Obtenir la cadena de connexió de la variable d'entorn
-  const connectionString = process.env.NEON_DATABASE_URL;
+  const connectionString = process.env.NETLIFY_DATABASE_URL;
 
   if (!connectionString) {
     return {
       statusCode: 500,
       body: JSON.stringify({
-        error: "La variable d'entorn NEON_DATABASE_URL no està configurada.",
+        error: "La variable d'entorn NETLIFY_DATABASE_URL no està configurada.",
       }),
     };
   }
