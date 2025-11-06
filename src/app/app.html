@@ -232,6 +232,26 @@
       </svg>
       <h1>Hello, {{ title() }}</h1>
       <p>Congratulations! Your app is running. 🎉</p>
+      <div style="margin-top: 12px;">
+        @if (supabaseService.user()) {
+          <div>
+            <p><strong>Logged in as:</strong> {{ supabaseService.user()?.email }}</p>
+            <!-- @if (supabaseService.user()?.user_metadata?.avatar_url) {
+              <img [src]="supabaseService.user()?.user_metadata?.avatar_url" alt="avatar" width="48" height="48" style="border-radius: 50%;"/>
+            } -->
+            <div style="margin-top:8px;">
+              <button class="pill" (click)="supabaseService.signOut()">Sign out</button>
+            </div>
+            <div style="margin-top:8px;">
+              <button class="pill" (click)="addClothAndFetch()">Add Cloth and Fetch</button>
+            </div>
+          </div>
+        } @else {
+          <div>
+            <button class="pill" (click)="supabaseService.signInWithGoogle()">Sign in with Google</button>
+          </div>
+        }
+      </div>
     </div>
     <div class="divider" role="separator" aria-label="Divider"></div>
     <div class="right-side">
