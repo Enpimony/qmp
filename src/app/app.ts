@@ -1,11 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RouterOutlet, RouterLinkWithHref, RouterLink } from '@angular/router';
 import { SupabaseService } from './supabase.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, RouterLinkWithHref, RouterLink],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
@@ -27,7 +27,8 @@ export class App {
   }
 
   async addClothAndFetch() {
-    await this.supabaseService.addClothAndFetch()
+    await this.supabaseService
+      .addClothAndFetch()
       .then((result: any) => console.log('Done', result))
       .catch((error: any) => console.error('Error', error));
   }
