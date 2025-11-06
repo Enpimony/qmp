@@ -1,5 +1,5 @@
 <nav class="relative bg-gray-800">
-  <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+  <div class="mx-auto px-2 sm:px-6 lg:px-8">
     <div class="relative flex h-16 items-center justify-between">
       <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
         <!-- Mobile menu button-->
@@ -39,7 +39,7 @@
           </svg>
         </button>
       </div>
-      <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
+      <div class="flex flex-1 justify-between sm:items-stretch sm:justify-start">
         <div class="flex shrink-0 items-center">
           <img
             src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500"
@@ -58,6 +58,19 @@
               >Photobooth</a
             >
           </div>
+        </div>
+        <div class="align-right flex flex-1 justify-end">
+          <button
+            class="relative flex rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+          >
+            <span class="absolute -inset-1.5"></span>
+            <span class="sr-only">Open user menu</span>
+            <img
+              [src]="userAvatar()"
+              alt=""
+              class="w-8 rounded-full bg-gray-800 outline -outline-offset-1 outline-white/10"
+            />
+          </button>
         </div>
       </div>
     </div>
