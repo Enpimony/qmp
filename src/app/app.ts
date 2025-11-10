@@ -34,11 +34,4 @@ export class App {
       console.log(data);
     });
   }
-
-  async addClothAndFetch() {
-    await this.supabaseService
-      .addClothAndFetch()
-      .then((result: any) => console.log('Done', result))
-      .catch((error: any) => console.error('Error', error));
-  }
 }

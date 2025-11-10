@@ -190,6 +190,24 @@ export class SupabaseService {
   }
 
   /**
+   * DELETE clothes
+   * @param clothesId The clothes UUID
+   */
+  async deleteClothes(clothesId: string) {
+    const { data, error } = await this.getClient()
+      .from('clothes')
+      .delete()
+      .eq('id', clothesId)
+      .select() // returns deleted rows (optional)
+
+    if (error) {
+      console.error('Delete error:', error)
+    } else {
+      console.log('Deleted rows:', data)
+    }
+  }
+
+  /**
    * DELETE outfit item
    * @param outfitId The outfit UUID
    * @param clothesId The clothes UUID
@@ -275,52 +293,6 @@ export class SupabaseService {
    */
   getClient(): SupabaseClient {
     return this.supabase;
-  }
-
-
-  async addClothAndFetch() {
-    const newCloth = {
-        name: 'Camisa blanca de flores',
-        slot: 'torso',
-        is_public: true,
-        owner_id: this.user()?.id ?? ''
-      }
-  
-      const insertRes = await this.supabase
-        .from('clothes')
-        .insert([newCloth])
-        .select()
-        .single();
-  
-      if (insertRes.error) {
-        throw insertRes.error
-      }
-  
-      const insertedCloth = insertRes.data;
-      console.log('Inserted cloth:', insertedCloth);
-  
-      const clothId = insertedCloth.id;
-  
-      const fetchById = await this.supabase
-        .from('clothes')
-        .select('*')
-        .eq('id', clothId)
-        .single()
-  
-      if (fetchById.error) throw fetchById.error;
-      console.log('Fetched by id:', fetchById.data);
-  
-      const fetchByName = await this.supabase
-        .from('clothes')
-        .select('id, name, slot')
-        .ilike('name', '%flores%')
-        .order('created_at', { ascending: false })
-        .limit(10)
-  
-      if (fetchByName.error) throw fetchByName.error
-      console.log('Fetched by name filter (matching "flores"):', fetchByName.data);
-  
-      return { inserted: insertedCloth, byId: fetchById.data, byName: fetchByName.data }
   }
   
 }
