@@ -31,8 +31,7 @@ export class PhotoBoothPageComponent {
     // 3) Crea l'ImageSegmenter (model per segmentar persones/selfie)
     this.segmenter = await ImageSegmenter.createFromOptions(visionFileset, {
       baseOptions: {
-        modelAssetPath:
-          'https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie/float16/1/model.tflite',
+        modelAssetPath: 'mediapipe.tflite',
       },
       runningMode: 'VIDEO', // important per a vídeo en temps real
     });
