@@ -49,7 +49,7 @@ export class PhotoBoothPageComponent {
       if (video.readyState >= 2 && this.segmenter) {
         // segmentForVideo accepta el vídeo i un timestamp (performance.now())
         const result = await this.segmenter.segmentForVideo(video, performance.now());
-
+        console.log('Tinc resultat', result);
         // result pot tenir diferents formes depenent de la versió; intentem trobar la màscara
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
