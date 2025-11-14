@@ -31,7 +31,7 @@ export class PhotoBoothPageComponent {
     // 3) Crea l'ImageSegmenter (model per segmentar persones/selfie)
     this.segmenter = await ImageSegmenter.createFromOptions(visionFileset, {
       baseOptions: {
-        modelAssetPath: 'selfie_segmentation.tflite',
+        modelAssetPath: 'selfie_multiclass_256x256.tflite',
       },
       runningMode: 'VIDEO', // important per a vídeo en temps real
     });
