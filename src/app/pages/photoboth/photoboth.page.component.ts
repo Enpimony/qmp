@@ -40,8 +40,7 @@ export class PhotoBoothPageComponent implements AfterViewInit, OnDestroy {
     // Create the ImageSegmenter for selfie/person segmentation
     this.segmenter = await ImageSegmenter.createFromOptions(visionFileset, {
       baseOptions: {
-        modelAssetPath:
-          'https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie/float16/1/model.tflite',
+        modelAssetPath: 'selfie_multiclass_256x256.tflite',
       },
       // Use the library's expected string literal for video mode
       runningMode: 'VIDEO',
