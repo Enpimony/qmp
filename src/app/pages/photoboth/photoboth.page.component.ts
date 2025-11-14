@@ -7,7 +7,6 @@ import { FilesetResolver, ImageSegmenter } from '@mediapipe/tasks-vision';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './photoboth.page.component.html',
-  styleUrls: ['./photoboth.page.component.scss'],
 })
 export class PhotoBoothPageComponent implements AfterViewInit, OnDestroy {
   @ViewChild('video', { static: true }) videoRef!: ElementRef<HTMLVideoElement>;
