@@ -2,6 +2,14 @@
   <h1 class="text-2xl font-bold mb-4">Photo Booth</h1>
 
   <div class="camera-container">
-    <!-- Add your camera/photo content here -->
+    <div>
+      <h3>Webcam</h3>
+      <video #video width="320" autoplay playsinline></video>
+    </div>
+
+    <div>
+      <h3>Sense fons (temps real)</h3>
+      <canvas #output width="320"></canvas>
+    </div>
   </div>
 </div>

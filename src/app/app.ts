@@ -29,10 +29,6 @@ export class App {
     if (user?.user_metadata?.['avatar_url']) {
       this.userAvatar.set(user.user_metadata['avatar_url']);
     }
-
-    this.http.get('/.netlify/functions/consulta').subscribe((data) => {
-      console.log(data);
-    });
   }
 
   async addClothAndFetch() {
