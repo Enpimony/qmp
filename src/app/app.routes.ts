@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { InventoryPageComponent } from './pages/inventory/inventory.page.component';
-import { PhotoBoothPageComponent } from './pages/photoboth/photoboth.page.component';
+import { PhotoBoothPageComponent } from './pages/photobooth/photobooth.page.component';
 
 export const routes: Routes = [
   {
