@@ -2,6 +2,7 @@ import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PhotoboothSectionComponent } from 'src/app/components/photobooth-section/photobooth-section';
 import { PhotoboothSectionItemComponent } from 'src/app/components/photobooth-section-item/photobooth-section-item';
+import { PhotoManagerComponent } from 'src/app/components/photo-manager/photo-manager';
 
 export interface Item {
   id: string;
@@ -16,7 +17,12 @@ export interface Section {
 @Component({
   selector: 'app-photobooth',
   standalone: true,
-  imports: [CommonModule, PhotoboothSectionComponent, PhotoboothSectionItemComponent],
+  imports: [
+    CommonModule,
+    PhotoboothSectionComponent,
+    PhotoboothSectionItemComponent,
+    PhotoManagerComponent,
+  ],
   templateUrl: './photobooth.page.component.html',
   styleUrls: ['./photobooth.page.component.scss'],
 })

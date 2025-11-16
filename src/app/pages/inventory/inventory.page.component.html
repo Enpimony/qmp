@@ -6,42 +6,48 @@
     <div class="space-y-4">
       <div>
         <h2 class="text-xl font-semibold mb-1">Add New Clothes</h2>
-        <p class="text-sm text-muted-foreground">Fill in the details to add a new clothing item to your inventory.</p>
+        <p class="text-sm text-muted-foreground">
+          Fill in the details to add a new clothing item to your inventory.
+        </p>
       </div>
-      
+
       <div class="rounded-lg border border-border bg-card p-6">
         <form [formGroup]="clothesForm" (ngSubmit)="insertClothes()" class="space-y-6">
-        <!-- Clothing Name Field -->
-        <div class="space-y-2">
-          <label 
-            for="name" 
-            class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-          >
-            Clothing Name
-          </label>
-          <input
-            id="name"
-            type="text"
-            formControlName="name"
-            placeholder="Enter clothing name"
-            class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-            required
-          />
-          @if (clothesForm.get('name')?.invalid && clothesForm.get('name')?.touched) {
+          <div class="space-y-2">
+            <app-photo-manager></app-photo-manager>
+          </div>
+          <!-- Clothing Name Field -->
+          <div class="space-y-2">
+            <label
+              for="name"
+              class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Clothing Name
+            </label>
+            <input
+              id="name"
+              type="text"
+              formControlName="name"
+              placeholder="Enter clothing name"
+              class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              required
+            />
+            @if (clothesForm.get('name')?.invalid && clothesForm.get('name')?.touched) {
             <p class="text-sm text-destructive">Name is required</p>
-          }
-        </div>
+            }
+          </div>
 
-        <!-- Slot Selection Field -->
-        <div class="space-y-2">
-          <label class="text-sm font-medium leading-none">
-            Slot
-          </label>
-          <app-radio-group orientation="vertical">
-            @for (slot of slotOptions; track slot) {
-              <label 
+          <!-- Slot Selection Field -->
+          <div class="space-y-2">
+            <label class="text-sm font-medium leading-none"> Slot </label>
+            <app-radio-group orientation="vertical">
+              @for (slot of slotOptions; track slot) {
+              <label
                 [for]="'slot-' + slot"
-                [class]="'flex items-center space-x-2 rounded-md border bg-background px-3 py-2 text-sm font-medium ring-offset-background transition-all hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 cursor-pointer ' + getRadioLabelClasses(clothesForm.get('slot')?.value === slot)"
+                [class]="
+                  'flex items-center space-x-2 rounded-md border bg-background px-3 py-2 text-sm font-medium ring-offset-background transition-all hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 cursor-pointer ' +
+                  getRadioLabelClasses(clothesForm.get('slot')?.value === slot)
+                "
               >
                 <input
                   [id]="'slot-' + slot"
@@ -50,34 +56,37 @@
                   [value]="slot"
                   class="peer sr-only"
                 />
-                <span 
-                  [class]="'relative flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ' + getRadioButtonClasses(clothesForm.get('slot')?.value === slot)"
+                <span
+                  [class]="
+                    'relative flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ' +
+                    getRadioButtonClasses(clothesForm.get('slot')?.value === slot)
+                  "
                 >
                   @if (clothesForm.get('slot')?.value === slot) {
-                    <span class="absolute inset-0 flex items-center justify-center">
-                      <span class="h-2 w-2 rounded-full bg-primary"></span>
-                    </span>
+                  <span class="absolute inset-0 flex items-center justify-center">
+                    <span class="h-2 w-2 rounded-full bg-primary"></span>
+                  </span>
                   }
                 </span>
                 <span class="text-sm font-medium leading-none capitalize">
                   {{ slot }}
                 </span>
               </label>
-            }
-          </app-radio-group>
-          @if (clothesForm.get('slot')?.invalid && clothesForm.get('slot')?.touched) {
+              }
+            </app-radio-group>
+            @if (clothesForm.get('slot')?.invalid && clothesForm.get('slot')?.touched) {
             <p class="text-sm text-destructive">Please select a slot</p>
-          }
-        </div>
+            }
+          </div>
 
-        <!-- Submit Button -->
-        <button 
-          type="submit"
-          [disabled]="clothesForm.invalid"
-          class="w-full inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
-        >
-          Add Clothes
-        </button>
+          <!-- Submit Button -->
+          <button
+            type="submit"
+            [disabled]="clothesForm.invalid"
+            class="w-full inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
+          >
+            Add Clothes
+          </button>
         </form>
       </div>
     </div>
@@ -86,30 +95,32 @@
     <div>
       <h2 class="text-xl font-semibold mb-4">My Clothes</h2>
       @if (myClothes().length === 0) {
-        <p class="text-sm text-muted-foreground">No clothes in inventory yet. Add some using the form!</p>
+      <p class="text-sm text-muted-foreground">
+        No clothes in inventory yet. Add some using the form!
+      </p>
       } @else {
-        <app-item-group>
-          @for (cloth of myClothes(); track cloth.id) {
-            <app-item variant="outline">
-              <app-item-content>
-                <app-item-title>{{ cloth.name }}</app-item-title>
-                <app-item-description>
-                  Slot: {{ cloth.slot }} • {{ cloth.is_public ? 'Public' : 'Private' }}
-                </app-item-description>
-              </app-item-content>
-              <app-item-actions>
-                <button
-                  type="button"
-                  (click)="deleteClothes(cloth.id)"
-                  class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 px-3 text-destructive hover:text-destructive hover:bg-destructive/10"
-                  title="Delete item"
-                >
-                  Delete
-                </button>
-              </app-item-actions>
-            </app-item>
-          }
-        </app-item-group>
+      <app-item-group>
+        @for (cloth of myClothes(); track cloth.id) {
+        <app-item variant="outline">
+          <app-item-content>
+            <app-item-title>{{ cloth.name }}</app-item-title>
+            <app-item-description>
+              Slot: {{ cloth.slot }} • {{ cloth.is_public ? 'Public' : 'Private' }}
+            </app-item-description>
+          </app-item-content>
+          <app-item-actions>
+            <button
+              type="button"
+              (click)="deleteClothes(cloth.id)"
+              class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 px-3 text-destructive hover:text-destructive hover:bg-destructive/10"
+              title="Delete item"
+            >
+              Delete
+            </button>
+          </app-item-actions>
+        </app-item>
+        }
+      </app-item-group>
       }
     </div>
   </div>

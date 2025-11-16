@@ -11,6 +11,7 @@ import {
   ItemActionsComponent,
 } from '../../components/item/item.component';
 import { RadioGroupComponent } from '../../components/radio-group/radio-group.component';
+import { PhotoManagerComponent } from 'src/app/components/photo-manager/photo-manager';
 
 @Component({
   selector: 'app-inventory',
@@ -25,12 +26,12 @@ import { RadioGroupComponent } from '../../components/radio-group/radio-group.co
     ItemDescriptionComponent,
     ItemActionsComponent,
     RadioGroupComponent,
+    PhotoManagerComponent,
   ],
   templateUrl: './inventory.page.component.html',
   styleUrls: ['./inventory.page.component.scss'],
 })
 export class InventoryPageComponent implements OnInit {
-  
   private inventoryService = inject(InventoryService);
   private fb = inject(FormBuilder);
 
@@ -40,7 +41,7 @@ export class InventoryPageComponent implements OnInit {
   clothesForm: FormGroup = this.fb.group({
     name: ['', [Validators.required]],
     slot: ['torso', [Validators.required]],
-    is_public: [true]
+    is_public: [true],
   });
 
   async ngOnInit() {
@@ -67,15 +68,11 @@ export class InventoryPageComponent implements OnInit {
   }
 
   getRadioLabelClasses(isChecked: boolean): string {
-    return isChecked 
-      ? 'border-primary bg-accent text-accent-foreground' 
-      : 'border-input';
+    return isChecked ? 'border-primary bg-accent text-accent-foreground' : 'border-input';
   }
 
   getRadioButtonClasses(isChecked: boolean): string {
-    return isChecked 
-      ? 'border-primary' 
-      : 'border-input';
+    return isChecked ? 'border-primary' : 'border-input';
   }
 
   async deleteClothes(clothesId: string) {

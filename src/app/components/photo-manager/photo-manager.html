@@ -1,0 +1,50 @@
+<div class="container">
+  <div class="actions flex flex-row gap-2 mb-4">
+    <input
+      id="fileUpload"
+      class="hidden"
+      type="file"
+      accept="image/*"
+      (change)="onFileSelected($event)"
+    />
+    <label for="fileUpload" class="btn btn-blue cursor-pointer"> Upload Photo </label>
+  </div>
+  <div>
+    @if (preview() != null) {
+    <img [src]="preview()" #previewImage (load)="getColors()" class="max-w-sm mt-4 rounded-lg" />
+    <div class="mt-4">
+      @if (colors().dominant != null) {
+      <div class="mb-4">
+        <div class="font-bold mb-2">Dominant Color:</div>
+        <div
+          class="w-16 h-16 rounded"
+          [style.backgroundColor]="
+            'rgb(' +
+            colors().dominant![0] +
+            ',' +
+            colors().dominant![1] +
+            ',' +
+            colors().dominant![2] +
+            ')'
+          "
+        ></div>
+      </div>
+      } @if (colors().palette != null) {
+      <div>
+        <div class="font-bold mb-2">Color Palette:</div>
+        <div class="flex flex-row gap-2">
+          @for (color of colors().palette!; track color) {
+          <div
+            class="w-12 h-12 rounded"
+            [style.backgroundColor]="'rgb(' + color[0] + ',' + color[1] + ',' + color[2] + ')'"
+          ></div>
+          }
+        </div>
+      </div>
+      }
+    </div>
+    } @else { @if (previewLoading()) {
+    <div>Loading preview...</div>
+    } }
+  </div>
+</div>
