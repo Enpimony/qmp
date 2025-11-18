@@ -11,7 +11,8 @@ import {
   ItemActionsComponent,
 } from '../../components/item/item.component';
 import { RadioGroupComponent } from '../../components/radio-group/radio-group.component';
-import { PhotoManagerComponent } from 'src/app/components/photo-manager/photo-manager';
+import { PhotoManagerComponent } from '../../components/photo-manager/photo-manager';
+import { ColorResult } from '../../components/photo-manager/color-result';
 
 @Component({
   selector: 'app-inventory',
@@ -36,6 +37,8 @@ export class InventoryPageComponent implements OnInit {
   private fb = inject(FormBuilder);
 
   myClothes = signal<any[]>([]);
+  selectedPhotoFile = signal<File | null>(null);
+  selectedPhotoColors = signal<ColorResult>({ dominant: null, palette: null });
   slotOptions = ['head', 'torso', 'legs', 'feet'];
 
   clothesForm: FormGroup = this.fb.group({
@@ -62,9 +65,26 @@ export class InventoryPageComponent implements OnInit {
       const clothes = this.clothesForm.value;
       const insertedClothes = await this.inventoryService.insertClothes(clothes);
       console.log('Inserted clothes:', insertedClothes);
+      const photoFile = this.selectedPhotoFile();
+      if (photoFile) {
+        this.insertPhoto(insertedClothes.id, photoFile);
+      }
       this.clothesForm.reset({ slot: 'torso', is_public: true });
       await this.loadClothes();
     }
+  }
+
+  async insertPhoto(clothesId: string, file: File) {
+    const insertedPhoto = await this.inventoryService.insertPhoto(clothesId, file);
+    console.log('Inserted photo:', insertedPhoto);
+  }
+
+  onPhotoFileChange(file: File | null) {
+    this.selectedPhotoFile.set(file);
+  }
+
+  onPhotoColorsChange(colors: ColorResult) {
+    this.selectedPhotoColors.set(colors);
   }
 
   getRadioLabelClasses(isChecked: boolean): string {

@@ -14,7 +14,10 @@
       <div class="rounded-lg border border-border bg-card p-6">
         <form [formGroup]="clothesForm" (ngSubmit)="insertClothes()" class="space-y-6">
           <div class="space-y-2">
-            <app-photo-manager></app-photo-manager>
+            <app-photo-manager
+              (fileChange)="onPhotoFileChange($event)"
+              (colorsChange)="onPhotoColorsChange($event)"
+            ></app-photo-manager>
           </div>
           <!-- Clothing Name Field -->
           <div class="space-y-2">
@@ -107,6 +110,11 @@
             <app-item-description>
               Slot: {{ cloth.slot }} • {{ cloth.is_public ? 'Public' : 'Private' }}
             </app-item-description>
+            @if (cloth.images.length > 0) {
+              @for (image of cloth.images; track image.id) {
+                <img [src]="image.signedUrl"/>
+              }
+            }
           </app-item-content>
           <app-item-actions>
             <button
