@@ -11,7 +11,7 @@ interface ExtendedSectin extends Section {
   standalone: true,
   imports: [CommonModule],
   templateUrl: './photobooth-section.html',
-  styleUrls: ['./photobooth-section.scss'],
+  styleUrls: ['./photobooth-section.css'],
 })
 export class PhotoboothSectionComponent {
   readonly section = input<any>();

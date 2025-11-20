@@ -11,7 +11,7 @@ interface ExtendedItem extends Item {
   standalone: true,
   imports: [CommonModule],
   templateUrl: './photobooth-section-item.html',
-  styleUrls: ['./photobooth-section-item.scss'],
+  styleUrls: ['./photobooth-section-item.css'],
 })
 export class PhotoboothSectionItemComponent {
   readonly section = input<Section>();

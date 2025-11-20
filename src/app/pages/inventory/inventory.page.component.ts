@@ -2,15 +2,6 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { InventoryService } from '../../services/inventory.service';
-import {
-  ItemGroupComponent,
-  ItemComponent,
-  ItemContentComponent,
-  ItemTitleComponent,
-  ItemDescriptionComponent,
-  ItemActionsComponent,
-} from '../../components/item/item.component';
-import { RadioGroupComponent } from '../../components/radio-group/radio-group.component';
 import { PhotoManagerComponent } from '../../components/photo-manager/photo-manager';
 import { ColorResult } from '../../components/photo-manager/color-result';
 
@@ -20,17 +11,10 @@ import { ColorResult } from '../../components/photo-manager/color-result';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    ItemGroupComponent,
-    ItemComponent,
-    ItemContentComponent,
-    ItemTitleComponent,
-    ItemDescriptionComponent,
-    ItemActionsComponent,
-    RadioGroupComponent,
     PhotoManagerComponent,
   ],
   templateUrl: './inventory.page.component.html',
-  styleUrls: ['./inventory.page.component.scss'],
+  styleUrls: ['./inventory.page.component.css'],
 })
 export class InventoryPageComponent implements OnInit {
   private inventoryService = inject(InventoryService);
@@ -67,7 +51,7 @@ export class InventoryPageComponent implements OnInit {
       console.log('Inserted clothes:', insertedClothes);
       const photoFile = this.selectedPhotoFile();
       if (photoFile) {
-        this.insertPhoto(insertedClothes.id, photoFile);
+        await this.insertPhoto(insertedClothes.id, photoFile);
       }
       this.clothesForm.reset({ slot: 'torso', is_public: true });
       await this.loadClothes();
@@ -77,6 +61,7 @@ export class InventoryPageComponent implements OnInit {
   async insertPhoto(clothesId: string, file: File) {
     const insertedPhoto = await this.inventoryService.insertPhoto(clothesId, file);
     console.log('Inserted photo:', insertedPhoto);
+    return insertedPhoto;
   }
 
   onPhotoFileChange(file: File | null) {
@@ -85,14 +70,6 @@ export class InventoryPageComponent implements OnInit {
 
   onPhotoColorsChange(colors: ColorResult) {
     this.selectedPhotoColors.set(colors);
-  }
-
-  getRadioLabelClasses(isChecked: boolean): string {
-    return isChecked ? 'border-primary bg-accent text-accent-foreground' : 'border-input';
-  }
-
-  getRadioButtonClasses(isChecked: boolean): string {
-    return isChecked ? 'border-primary' : 'border-input';
   }
 
   async deleteClothes(clothesId: string) {

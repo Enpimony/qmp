@@ -7,7 +7,7 @@
       accept="image/*"
       (change)="onFileSelected($event)"
     />
-    <label for="fileUpload" class="btn btn-blue cursor-pointer"> Upload Photo </label>
+    <label for="fileUpload" class="btn btn-primary cursor-pointer"> Upload Photo </label>
   </div>
   <div>
     @if (preview() != null) {
@@ -17,7 +17,7 @@
       <div class="mb-4">
         <div class="font-bold mb-2">Dominant Color:</div>
         <div
-          class="w-16 h-16 rounded"
+          class="w-16 h-16 rounded-lg"
           [style.backgroundColor]="
             'rgb(' +
             colors().dominant![0] +
@@ -35,7 +35,7 @@
         <div class="flex flex-row gap-2">
           @for (color of colors().palette!; track color) {
           <div
-            class="w-12 h-12 rounded"
+            class="w-12 h-12 rounded-lg"
             [style.backgroundColor]="'rgb(' + color[0] + ',' + color[1] + ',' + color[2] + ')'"
           ></div>
           }
@@ -44,7 +44,7 @@
       }
     </div>
     } @else { @if (previewLoading()) {
-    <div>Loading preview...</div>
+    <div class="loading loading-spinner loading-md"></div>
     } }
   </div>
 </div>

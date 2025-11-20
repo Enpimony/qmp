@@ -9,7 +9,7 @@ import { SupabaseService } from './supabase.service';
   standalone: true,
   imports: [RouterOutlet, RouterLinkWithHref, RouterLink, CommonModule],
   templateUrl: './app.html',
-  styleUrl: './app.scss',
+  styleUrl: './app.css',
 })
 export class App {
   protected readonly title = signal('qmp');

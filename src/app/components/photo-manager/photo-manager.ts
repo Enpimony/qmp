@@ -8,7 +8,7 @@ import { ColorResult } from './color-result';
   standalone: true,
   imports: [CommonModule, ColorThiefModule],
   templateUrl: './photo-manager.html',
-  styleUrls: ['./photo-manager.scss'],
+  styleUrls: ['./photo-manager.css'],
 })
 export class PhotoManagerComponent {
   private selectedFile = signal<File | null>(null);

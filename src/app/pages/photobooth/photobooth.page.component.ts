@@ -24,7 +24,7 @@ export interface Section {
     PhotoManagerComponent,
   ],
   templateUrl: './photobooth.page.component.html',
-  styleUrls: ['./photobooth.page.component.scss'],
+  styleUrls: ['./photobooth.page.component.css'],
 })
 export class PhotoBoothPageComponent {
   sections = signal<Section[]>([
