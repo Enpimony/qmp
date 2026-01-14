@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Auth, GoogleAuthProvider, signInWithPopup, user, User } from '@angular/fire/auth';
 import { Storage, ref, uploadBytesResumable, percentage } from '@angular/fire/storage';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -19,7 +20,7 @@ export class App {
   user$ = user(this.auth);
   
   // Track upload progress
-  uploadProgress$: any = null;
+  uploadProgress$: Observable<number | undefined> | null = null;
   uploadState: string = '';
 
   // 1. Login Logic
@@ -45,7 +46,9 @@ export class App {
     const task = uploadBytesResumable(storageRef, file);
 
     // Link progress to UI
-    this.uploadProgress$ = percentage(task);
+    this.uploadProgress$ = percentage(task).pipe(
+      map(data => data.progress)
+    );
     
     // Monitor completion
     task.then(() => {

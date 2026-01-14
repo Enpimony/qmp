@@ -2,26 +2,30 @@
   
   <h1>Secret Vault 🔒</h1>
 
-  <div *ngIf="user$ | async as user; else loginTemplate">
-    <p>Welcome, <strong>{{ user.displayName }}</strong></p>
-    <button (click)="logout()">Logout</button>
+  @if (user$ | async; as user) {
+    <div>
+      <p>Welcome, <strong>{{ user.displayName }}</strong></p>
+      <button (click)="logout()">Logout</button>
 
-    <hr>
+      <hr>
 
-    <h3>Upload Private Photo</h3>
-    <input type="file" (change)="uploadFile($event, user)" accept="image/*">
+      <h3>Take & Upload Private Photo</h3>
+      <input type="file" (change)="uploadFile($event, user)" accept="image/*" capture="environment">
 
-    <!-- <div *ngIf="uploadProgress$ | async as pct">
-      <progress [value]="pct" max="100"></progress>
-      <span>{{ pct | number:'1.0-0' }}%</span>
-    </div> -->
+      @if (uploadProgress$ | async; as pct) {
+        <div>
+          <progress [value]="pct" max="100"></progress>
+          <span>{{ pct | number:'1.0-0' }}%</span>
+        </div>
+      }
 
-    <p *ngIf="uploadState">{{ uploadState }}</p>
-  </div>
-
-  <ng-template #loginTemplate>
+      @if (uploadState) {
+        <p>{{ uploadState }}</p>
+      }
+    </div>
+  } @else {
     <p>You must login to access your private folder.</p>
     <button (click)="login()">Login with Google</button>
-  </ng-template>
+  }
 
 </div>
