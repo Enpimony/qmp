@@ -1,0 +1,27 @@
+<div class="container" style="padding: 20px; font-family: sans-serif;">
+  
+  <h1>Secret Vault 🔒</h1>
+
+  <div *ngIf="user$ | async as user; else loginTemplate">
+    <p>Welcome, <strong>{{ user.displayName }}</strong></p>
+    <button (click)="logout()">Logout</button>
+
+    <hr>
+
+    <h3>Upload Private Photo</h3>
+    <input type="file" (change)="uploadFile($event, user)" accept="image/*">
+
+    <!-- <div *ngIf="uploadProgress$ | async as pct">
+      <progress [value]="pct" max="100"></progress>
+      <span>{{ pct | number:'1.0-0' }}%</span>
+    </div> -->
+
+    <p *ngIf="uploadState">{{ uploadState }}</p>
+  </div>
+
+  <ng-template #loginTemplate>
+    <p>You must login to access your private folder.</p>
+    <button (click)="login()">Login with Google</button>
+  </ng-template>
+
+</div>
