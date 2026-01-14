@@ -1,8 +1,0 @@
-.section-icon:hover {
-  cursor: pointer;
-  background: black;
-  img {
-    filter: invert(1);
-    cursor: pointer;
-  }
-}
