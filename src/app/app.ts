@@ -1,19 +1,8 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { Auth, GoogleAuthProvider, signInWithPopup, user, User } from '@angular/fire/auth';
-import { Storage, ref, uploadBytesResumable, percentage, getDownloadURL } from '@angular/fire/storage';
-import { Firestore, collection, addDoc, query, where, orderBy, collectionData } from '@angular/fire/firestore';
-import { Timestamp } from 'firebase/firestore';
-import { map, switchMap, of } from 'rxjs';
-
-export interface ImageMetadata {
-  id?: string;
-  name: string;
-  imageUrl: string;
-  userId: string;
-  createdAt: Date;
-}
+import { AuthService } from './services/auth.service';
+import { StorageService } from './services/storage.service';
+import { ImagesService } from './services/images.service';
 
 @Component({
   selector: 'app-root',
@@ -23,12 +12,13 @@ export interface ImageMetadata {
   styleUrls: ['./app.css']
 })
 export class App {
-  private auth: Auth = inject(Auth);
-  private storage: Storage = inject(Storage);
-  private firestore: Firestore = inject(Firestore);
+  // Inject services
+  private authService = inject(AuthService);
+  private storageService = inject(StorageService);
+  private imagesService = inject(ImagesService);
 
-  // Signal of the currently logged-in user
-  user = toSignal(user(this.auth), { initialValue: null });
+  // Expose user signal for template
+  readonly user = this.authService.user;
   
   // Track upload progress
   uploadProgress = signal<number | undefined>(undefined);
@@ -39,43 +29,15 @@ export class App {
   previewUrl: string | null = null;
   
   // User's images - automatically loads when user logs in
-  private user$ = user(this.auth);
-  images = toSignal(
-    this.user$.pipe(
-      switchMap((user) => {
-        if (!user) {
-          return of([]);
-        }
-        const imagesCollection = collection(this.firestore, 'images');
-        const q = query(
-          imagesCollection,
-          where('userId', '==', user.uid),
-          orderBy('createdAt', 'desc')
-        );
-        return collectionData(q, { idField: 'id' }).pipe(
-          map((images: any[]) => 
-            images.map(img => ({
-              ...img,
-              createdAt: img.createdAt instanceof Timestamp 
-                ? img.createdAt.toDate() 
-                : img.createdAt instanceof Date 
-                  ? img.createdAt 
-                  : new Date(img.createdAt)
-            }))
-          )
-        );
-      })
-    ),
-    { initialValue: [] as ImageMetadata[] }
-  );
+  readonly images = this.imagesService.getUserImagesSignal();
 
   // 1. Login Logic
-  login() {
-    signInWithPopup(this.auth, new GoogleAuthProvider());
+  async login(): Promise<void> {
+    await this.authService.login();
   }
 
-  logout() {
-    this.auth.signOut();
+  async logout(): Promise<void> {
+    await this.authService.logout();
   }
 
   // 2. Photo Selection & Preview
@@ -109,40 +71,38 @@ export class App {
   }
 
   // 3. Upload Logic
-  async uploadFile(currentUser: User) {
+  async uploadFile(): Promise<void> {
     if (!this.selectedFile) return;
 
-    // PATH SECURITY: We put the file inside 'private_uploads/{uid}/'
-    // This matches the Security Rules we wrote earlier.
-    const filePath = `private_uploads/${currentUser.uid}/${this.selectedFile.name}`;
-    const storageRef = ref(this.storage, filePath);
+    const currentUser = this.user();
+    if (!currentUser) {
+      this.uploadState.set('Error: User not authenticated');
+      return;
+    }
 
-    // Start the upload
-    const task = uploadBytesResumable(storageRef, this.selectedFile);
-
-    // Link progress to UI using signal
-    const progressSubscription = percentage(task).pipe(
-      map(data => data.progress)
-    ).subscribe(progress => {
-      this.uploadProgress.set(progress);
-    });
-    
-    // Monitor completion
     try {
-      await task;
-      
-      // Get the download URL
-      const downloadURL = await getDownloadURL(storageRef);
-      
-      // Create document in Firestore
-      const imagesCollection = collection(this.firestore, 'images');
-      await addDoc(imagesCollection, {
+      // Generate secure file path
+      const filePath = this.storageService.getUserUploadPath(
+        currentUser.uid,
+        this.selectedFile.name
+      );
+
+      // Upload file with progress tracking
+      const downloadURL = await this.storageService.uploadFile(
+        this.selectedFile,
+        filePath,
+        (progress) => {
+          this.uploadProgress.set(progress);
+        }
+      );
+
+      // Create image metadata in Firestore
+      await this.imagesService.createImage({
         name: this.selectedFile.name,
         imageUrl: downloadURL,
-        userId: currentUser.uid,
-        createdAt: new Date()
+        userId: currentUser.uid
       });
-      
+
       this.uploadState.set('Upload Complete!');
       
       // Clear preview after successful upload
@@ -150,9 +110,6 @@ export class App {
       this.removePreview();
     } catch (err: any) {
       this.uploadState.set('Error: ' + err.message);
-    } finally {
-      // Always clean up subscription and reset progress
-      progressSubscription.unsubscribe();
       this.uploadProgress.set(undefined);
     }
   }
