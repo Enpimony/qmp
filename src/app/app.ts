@@ -4,6 +4,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { Auth, GoogleAuthProvider, signInWithPopup, user, User } from '@angular/fire/auth';
 import { Storage, ref, uploadBytesResumable, percentage, getDownloadURL } from '@angular/fire/storage';
 import { Firestore, collection, addDoc, query, where, orderBy, collectionData } from '@angular/fire/firestore';
+import { Timestamp } from 'firebase/firestore';
 import { map, switchMap, of } from 'rxjs';
 
 export interface ImageMetadata {
@@ -51,7 +52,18 @@ export class App {
           where('userId', '==', user.uid),
           orderBy('createdAt', 'desc')
         );
-        return collectionData(q, { idField: 'id' });
+        return collectionData(q, { idField: 'id' }).pipe(
+          map((images: any[]) => 
+            images.map(img => ({
+              ...img,
+              createdAt: img.createdAt instanceof Timestamp 
+                ? img.createdAt.toDate() 
+                : img.createdAt instanceof Date 
+                  ? img.createdAt 
+                  : new Date(img.createdAt)
+            }))
+          )
+        );
       })
     ),
     { initialValue: [] as ImageMetadata[] }
