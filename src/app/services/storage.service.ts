@@ -1,5 +1,5 @@
 import { Injectable, inject, Injector, runInInjectionContext } from '@angular/core';
-import { Storage, ref, uploadBytesResumable, percentage, getDownloadURL } from '@angular/fire/storage';
+import { Storage, ref, uploadBytesResumable, percentage, getDownloadURL, deleteObject } from '@angular/fire/storage';
 import { map } from 'rxjs';
 
 export interface UploadProgress {
@@ -76,6 +76,18 @@ export class StorageService {
    */
   getUserUploadPath(userId: string, fileName: string): string {
     return `private_uploads/${userId}/${fileName}`;
+  }
+
+  /**
+   * Delete a file from Firebase Storage
+   * @param path The storage path to delete
+   * @returns Promise that resolves when deletion is complete
+   */
+  async deleteFile(path: string): Promise<void> {
+    return runInInjectionContext(this.injector, async () => {
+      const storageRef = ref(this.storage, path);
+      await deleteObject(storageRef);
+    });
   }
 }
 

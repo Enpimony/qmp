@@ -1,5 +1,5 @@
 import { Injectable, inject, Injector, runInInjectionContext } from '@angular/core';
-import { Firestore, collection, addDoc, query, where, orderBy, collectionData } from '@angular/fire/firestore';
+import { Firestore, collection, addDoc, query, where, orderBy, collectionData, doc, deleteDoc } from '@angular/fire/firestore';
 import { Timestamp } from 'firebase/firestore';
 import { map, switchMap, of, Observable } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -100,6 +100,18 @@ export class ImagesService {
       ),
       { initialValue: [] as ImageMetadata[] }
     );
+  }
+
+  /**
+   * Delete an image document from Firestore
+   * @param imageId The document ID of the image to delete
+   * @returns Promise that resolves when deletion is complete
+   */
+  async deleteImage(imageId: string): Promise<void> {
+    return runInInjectionContext(this.injector, async () => {
+      const imageDoc = doc(this.firestore, this.COLLECTION_NAME, imageId);
+      await deleteDoc(imageDoc);
+    });
   }
 }
 
