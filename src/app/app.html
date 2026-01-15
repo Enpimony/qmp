@@ -52,16 +52,52 @@
                   }
                 </div>
                 <div style="padding: 10px;">
-                  <p style="margin: 0; font-weight: bold; font-size: 14px; word-break: break-word;">{{ image.name }}</p>
+                  @if (isEditing(image.id)) {
+                    <div style="margin-bottom: 10px;">
+                      <input 
+                        type="text" 
+                        [value]="getEditingName(image.id)"
+                        (input)="updateEditingName(image.id!, $any($event.target).value)"
+                        (keydown.enter)="saveImageName(image)"
+                        (keydown.escape)="cancelEditing(image.id)"
+                        style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; font-weight: bold;"
+                        autofocus>
+                      <div style="display: flex; gap: 5px; margin-top: 5px;">
+                        <button 
+                          (click)="saveImageName(image)"
+                          [disabled]="isDeleting(image.id)"
+                          style="flex: 1; padding: 4px 8px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 11px;">
+                          Save
+                        </button>
+                        <button 
+                          (click)="cancelEditing(image.id)"
+                          [disabled]="isDeleting(image.id)"
+                          style="flex: 1; padding: 4px 8px; background-color: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 11px;">
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  } @else {
+                    <div style="display: flex; align-items: center; gap: 5px; margin-bottom: 5px;">
+                      <p style="margin: 0; font-weight: bold; font-size: 14px; word-break: break-word; flex: 1;">{{ image.name }}</p>
+                      <button 
+                        (click)="startEditing(image)"
+                        [disabled]="isDeleting(image.id)"
+                        style="padding: 4px 8px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 11px;"
+                        title="Edit name">
+                        ✏️
+                      </button>
+                    </div>
+                  }
                   <p style="margin: 5px 0 10px 0; font-size: 12px; color: #666;">
                     {{ image.createdAt | date:'short' }}
                   </p>
                   <button 
                     (click)="deleteImage(image)" 
-                    [disabled]="isDeleting(image.id)"
+                    [disabled]="isDeleting(image.id) || isEditing(image.id)"
                     style="width: 100%; padding: 6px 12px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;"
-                    [style.opacity]="isDeleting(image.id) ? '0.6' : '1'"
-                    [style.cursor]="isDeleting(image.id) ? 'not-allowed' : 'pointer'">
+                    [style.opacity]="(isDeleting(image.id) || isEditing(image.id)) ? '0.6' : '1'"
+                    [style.cursor]="(isDeleting(image.id) || isEditing(image.id)) ? 'not-allowed' : 'pointer'">
                     @if (isDeleting(image.id)) {
                       Deleting...
                     } @else {

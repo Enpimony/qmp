@@ -1,5 +1,5 @@
 import { Injectable, inject, Injector, runInInjectionContext } from '@angular/core';
-import { Firestore, collection, addDoc, query, where, orderBy, collectionData, doc, deleteDoc } from '@angular/fire/firestore';
+import { Firestore, collection, addDoc, query, where, orderBy, collectionData, doc, deleteDoc, updateDoc } from '@angular/fire/firestore';
 import { Timestamp } from 'firebase/firestore';
 import { map, switchMap, of, Observable } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -111,6 +111,19 @@ export class ImagesService {
     return runInInjectionContext(this.injector, async () => {
       const imageDoc = doc(this.firestore, this.COLLECTION_NAME, imageId);
       await deleteDoc(imageDoc);
+    });
+  }
+
+  /**
+   * Update an image document in Firestore
+   * @param imageId The document ID of the image to update
+   * @param updates Partial update object (only fields to update)
+   * @returns Promise that resolves when update is complete
+   */
+  async updateImage(imageId: string, updates: Partial<Omit<ImageMetadata, 'id' | 'createdAt'>>): Promise<void> {
+    return runInInjectionContext(this.injector, async () => {
+      const imageDoc = doc(this.firestore, this.COLLECTION_NAME, imageId);
+      await updateDoc(imageDoc, updates);
     });
   }
 }

@@ -79,12 +79,46 @@ export class StorageService {
   }
 
   /**
-   * Delete a file from Firebase Storage
+   * Delete a file from Firebase Storage by path
    * @param path The storage path to delete
    * @returns Promise that resolves when deletion is complete
    */
   async deleteFile(path: string): Promise<void> {
     return runInInjectionContext(this.injector, async () => {
+      const storageRef = ref(this.storage, path);
+      await deleteObject(storageRef);
+    });
+  }
+
+  /**
+   * Extract the storage path from a Firebase Storage download URL
+   * Firebase Storage URLs format: https://firebasestorage.googleapis.com/v0/b/{bucket}/o/{encodedPath}?alt=media&token=...
+   * @param downloadURL The download URL
+   * @returns The storage path
+   */
+  private extractPathFromUrl(downloadURL: string): string {
+    try {
+      // Find the part after /o/ and before ?
+      const match = downloadURL.match(/\/o\/([^?]+)/);
+      if (!match || !match[1]) {
+        throw new Error('Invalid Firebase Storage URL format');
+      }
+      // URL decode the path
+      return decodeURIComponent(match[1]);
+    } catch (error) {
+      throw new Error('Failed to extract path from Storage URL: ' + (error as Error).message);
+    }
+  }
+
+  /**
+   * Delete a file from Firebase Storage by its download URL
+   * This is useful when the filename may have been changed in Firestore
+   * @param downloadURL The download URL of the file to delete
+   * @returns Promise that resolves when deletion is complete
+   */
+  async deleteFileByUrl(downloadURL: string): Promise<void> {
+    return runInInjectionContext(this.injector, async () => {
+      const path = this.extractPathFromUrl(downloadURL);
       const storageRef = ref(this.storage, path);
       await deleteObject(storageRef);
     });

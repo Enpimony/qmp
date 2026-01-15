@@ -33,6 +33,9 @@ export class App {
   
   // Track which images are being deleted
   deletingImages = signal<Set<string>>(new Set());
+  
+  // Track which images are being edited (imageId -> edited name)
+  editingImages = signal<Map<string, string>>(new Map());
 
   // 1. Login Logic
   async login(): Promise<void> {
@@ -140,12 +143,9 @@ export class App {
     this.deletingImages.update(set => new Set(set).add(image.id!));
 
     try {
-      // Delete file from Storage
-      const filePath = this.storageService.getUserUploadPath(
-        currentUser.uid,
-        image.name
-      );
-      await this.storageService.deleteFile(filePath);
+      // Delete file from Storage using the URL (which contains the original path)
+      // This works even if the name was edited in Firestore
+      await this.storageService.deleteFileByUrl(image.imageUrl);
 
       // Delete document from Firestore
       await this.imagesService.deleteImage(image.id);
@@ -173,5 +173,93 @@ export class App {
   isDeleting(imageId: string | undefined): boolean {
     if (!imageId) return false;
     return this.deletingImages().has(imageId);
+  }
+
+  // 5. Edit Logic
+  startEditing(image: ImageMetadata): void {
+    if (!image.id) return;
+    this.editingImages.update(map => {
+      const newMap = new Map(map);
+      newMap.set(image.id!, image.name);
+      return newMap;
+    });
+  }
+
+  cancelEditing(imageId: string | undefined): void {
+    if (!imageId) return;
+    this.editingImages.update(map => {
+      const newMap = new Map(map);
+      newMap.delete(imageId);
+      return newMap;
+    });
+  }
+
+  updateEditingName(imageId: string, newName: string): void {
+    this.editingImages.update(map => {
+      const newMap = new Map(map);
+      newMap.set(imageId, newName);
+      return newMap;
+    });
+  }
+
+  getEditingName(imageId: string | undefined): string {
+    if (!imageId) return '';
+    return this.editingImages().get(imageId) || '';
+  }
+
+  isEditing(imageId: string | undefined): boolean {
+    if (!imageId) return false;
+    return this.editingImages().has(imageId);
+  }
+
+  async saveImageName(image: ImageMetadata): Promise<void> {
+    if (!image.id) {
+      this.uploadState.set('Error: Image ID not found');
+      return;
+    }
+
+    const currentUser = this.user();
+    if (!currentUser) {
+      this.uploadState.set('Error: User not authenticated');
+      return;
+    }
+
+    // Verify the image belongs to the current user
+    if (image.userId !== currentUser.uid) {
+      this.uploadState.set('Error: Unauthorized to edit this image');
+      return;
+    }
+
+    const editedName = this.getEditingName(image.id);
+    if (!editedName || editedName.trim() === '') {
+      this.uploadState.set('Error: Name cannot be empty');
+      this.cancelEditing(image.id);
+      return;
+    }
+
+    // If name hasn't changed, just cancel editing
+    if (editedName === image.name) {
+      this.cancelEditing(image.id);
+      return;
+    }
+
+    try {
+      await this.imagesService.updateImage(image.id, {
+        name: editedName.trim()
+      });
+
+      // Images list will automatically refresh via the signal
+      this.uploadState.set('Name updated successfully');
+      
+      // Clear message after a short delay
+      setTimeout(() => {
+        this.uploadState.set('');
+      }, 2000);
+
+      // Cancel editing
+      this.cancelEditing(image.id);
+    } catch (err: any) {
+      this.uploadState.set('Error updating name: ' + err.message);
+    }
   }
 }
