@@ -1,0 +1,67 @@
+<div class="card bg-base-100 shadow-md mx-auto p-4 max-w-4xl">
+  <div class="card-body">
+    <h2 class="card-title">Remove Background</h2>
+
+    <div class="flex flex-col gap-6 items-start">
+      <div class="flex flex-row">
+        <label class="btn btn-primary">
+          Choose image...
+          <input type="file" accept="image/*" (change)="onFileSelected($event)" class="hidden" />
+        </label>
+
+        @if (processing()) {
+        <button class="btn btn-ghost ml-2" (click)="cancelProcessing()">Cancel</button>
+        } @if (processing()) {
+        <div class="mt-4 w-72">
+          <progress
+            class="progress progress-primary w-full"
+            [value]="progress() ?? 0"
+            max="100"
+          ></progress>
+          <div class="text-sm mt-2 flex items-center gap-3">
+            <span *ngIf="progress() !== null" class="font-semibold">{{ progress() }}%</span>
+            <span> Processing…</span>
+            <span class="badge badge-outline">Time: {{ elapsed() }}s</span>
+          </div>
+        </div>
+        }
+      </div>
+
+      <div class="flex-grow grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+        <div class="card bg-base-200 p-4">
+          @if (originalSrc()) {
+          <img
+            [src]="originalSrc()"
+            alt="Original image"
+            class="rounded-md shadow-sm w-full object-contain"
+          />
+          }
+        </div>
+
+        <div class="card bg-base-200 p-4">
+          <div class="relative">
+            @if (resultSrc()) {
+            <img
+              [src]="resultSrc()"
+              alt="Background removed"
+              class="rounded-md shadow-sm w-full object-contain"
+            />
+            } @if (resultSrc() && processing()) {
+            <div class="result-overlay">
+              <div class="result-overlay__content">
+                <span class="result-spinner" aria-hidden="true"></span>
+                <span>Finalizing…</span>
+                <span class="ml-3 font-mono">{{ elapsed() }}s</span>
+              </div>
+            </div>
+            }
+          </div>
+
+          @if (!resultSrc() && !processing()) {
+          <div class="text-sm text-muted">No result yet</div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

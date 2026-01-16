@@ -3,7 +3,7 @@ import { removeBackground, preload } from '@imgly/background-removal';
 
 addEventListener('message', async (ev) => {
   // support either transferred buffer or full file
-  const { buffer, file, type, maxWidthPreview = 256, maxWidthFinal = 512 } = ev.data;
+  const { buffer, file, type, maxWidthFinal = 512 } = ev.data;
   let inputSource: Blob | File;
   try {
     postMessage({ type: 'started' });
