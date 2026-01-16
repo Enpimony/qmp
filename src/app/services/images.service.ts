@@ -1,5 +1,16 @@
 import { Injectable, inject, Injector, runInInjectionContext } from '@angular/core';
-import { Firestore, collection, addDoc, query, where, orderBy, collectionData, doc, deleteDoc, updateDoc } from '@angular/fire/firestore';
+import {
+  Firestore,
+  collection,
+  addDoc,
+  query,
+  where,
+  orderBy,
+  collectionData,
+  doc,
+  deleteDoc,
+  updateDoc,
+} from '@angular/fire/firestore';
 import { Timestamp } from 'firebase/firestore';
 import { map, switchMap, of, Observable } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -14,7 +25,7 @@ export interface ImageMetadata {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ImagesService {
   private firestore: Firestore = inject(Firestore);
@@ -42,7 +53,7 @@ export class ImagesService {
   private transformImageData(doc: any): ImageMetadata {
     return {
       ...doc,
-      createdAt: this.convertTimestampToDate(doc.createdAt)
+      createdAt: this.convertTimestampToDate(doc.createdAt),
     };
   }
 
@@ -56,7 +67,7 @@ export class ImagesService {
       const imagesCollection = collection(this.firestore, this.COLLECTION_NAME);
       const docRef = await addDoc(imagesCollection, {
         ...metadata,
-        createdAt: new Date()
+        createdAt: new Date(),
       });
       return docRef.id;
     });
@@ -76,9 +87,9 @@ export class ImagesService {
         where('userId', '==', userId),
         orderBy('createdAt', 'desc')
       );
-      
+
       return collectionData(q, { idField: 'id' }).pipe(
-        map((images: any[]) => images.map(img => this.transformImageData(img)))
+        map((images: any[]) => images.map((img) => this.transformImageData(img)))
       );
     });
   }
@@ -120,11 +131,43 @@ export class ImagesService {
    * @param updates Partial update object (only fields to update)
    * @returns Promise that resolves when update is complete
    */
-  async updateImage(imageId: string, updates: Partial<Omit<ImageMetadata, 'id' | 'createdAt'>>): Promise<void> {
+  async updateImage(
+    imageId: string,
+    updates: Partial<Omit<ImageMetadata, 'id' | 'createdAt'>>
+  ): Promise<void> {
     return runInInjectionContext(this.injector, async () => {
       const imageDoc = doc(this.firestore, this.COLLECTION_NAME, imageId);
       await updateDoc(imageDoc, updates);
     });
   }
-}
 
+  private async scaleImageFile(file: Blob | File, maxWidth = 512): Promise<Blob> {
+    try {
+      const imgBitmap = await createImageBitmap(file);
+      if (imgBitmap.width <= maxWidth) {
+        imgBitmap.close?.();
+        return file; // no scaling needed
+      }
+
+      const scale = maxWidth / imgBitmap.width;
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(imgBitmap.width * scale);
+      canvas.height = Math.round(imgBitmap.height * scale);
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        imgBitmap.close?.();
+        return file;
+      }
+      ctx.drawImage(imgBitmap, 0, 0, canvas.width, canvas.height);
+      imgBitmap.close?.();
+
+      const blob = await new Promise<Blob | null>((resolve) =>
+        canvas.toBlob(resolve, (file as File).type || 'image/png')
+      );
+      return blob ?? file;
+    } catch (e) {
+      // If any error occurs, fallback to original file
+      return file;
+    }
+  }
+}
