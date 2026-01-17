@@ -105,31 +105,10 @@ export class App {
 
     // create worker and wire messages
     try {
-      // Use absolute path for web workers
-      const workerUrl = '/services/bg-remove.worker.js';
-      console.log('Creating worker with absolute URL:', workerUrl);
-
-      // Test if the worker URL is accessible before creating the worker
-      fetch(workerUrl, { method: 'HEAD' })
-        .then((response) => {
-          console.log(
-            'Worker URL response:',
-            response.status,
-            response.ok,
-            'Content-Type:',
-            response.headers.get('content-type')
-          );
-          if (!response.ok) {
-            throw new Error(`Worker URL not accessible: ${response.status}`);
-          }
-        })
-        .catch((fetchError) => {
-          console.error('Failed to fetch worker URL:', fetchError);
-        });
-
-      this.currentWorker = new Worker(workerUrl, {
+      this.currentWorker = new Worker(new URL('./services/bg-remove.worker', import.meta.url), {
         type: 'module',
       });
+
       console.log('Worker created successfully:', this.currentWorker);
     } catch (workerError) {
       console.error('Failed to create worker:', workerError);

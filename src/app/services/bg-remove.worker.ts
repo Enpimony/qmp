@@ -1,54 +1,19 @@
 /// <reference lib="webworker" />
-
-console.log('Worker script starting...');
-
-let removeBackground: any = null;
-let preload: any = null;
-
-// Try to import the background removal library
-(async () => {
-  try {
-    const module = await import('@imgly/background-removal');
-    removeBackground = module.removeBackground;
-    preload = module.preload;
-    console.log('Background removal library loaded successfully');
-  } catch (error) {
-    console.error('Failed to load background removal library:', error);
-    postMessage({ type: 'error', error: 'Failed to load background removal library' });
-  }
-})();
-
-addEventListener('error', (error) => {
-  console.error('Worker unhandled error:', error);
-  postMessage({ type: 'error', error: `Worker error: ${error.message}` });
-});
+import { removeBackground, preload } from '@imgly/background-removal';
 
 addEventListener('message', async (ev) => {
-  console.log('Worker received message:', ev.data);
-
-  // Check if library is loaded
-  if (!removeBackground || !preload) {
-    console.error('Background removal library not loaded yet');
-    postMessage({ type: 'error', error: 'Background removal library not loaded' });
-    return;
-  }
   // support either transferred buffer or full file
-  const { buffer, file, type, maxWidthFinal = 512 } = ev.data;
-  console.log('Processing data:', { buffer: !!buffer, file: !!file, type, maxWidthFinal });
+  const { buffer, file, type, maxWidthPreview = 256, maxWidthFinal = 512 } = ev.data;
   let inputSource: Blob | File;
   try {
-    console.log('Posting started message');
     postMessage({ type: 'started' });
 
     // Warm up model in worker if available
     try {
       // preload may be a no-op if already loaded; helps reduce first-run time
-      console.log('Starting preload');
       await (preload as any)();
-      console.log('Preload completed');
-    } catch (preloadError) {
+    } catch {
       // ignore preload errors
-      console.log('preload error:', preloadError);
     }
 
     if (buffer) {
@@ -58,7 +23,7 @@ addEventListener('message', async (ev) => {
     } else {
       throw new Error('No image provided');
     }
-    console.log('proce1');
+
     // helper to scale and run detection
     const runDetection = async (source: Blob | File, maxWidth: number) => {
       try {
@@ -93,16 +58,19 @@ addEventListener('message', async (ev) => {
         console.log('end detect');
         return resultBlob;
       } catch (err) {
+        console.log('error remove');
+        console.log(err);
         throw err;
       }
     };
 
     // 2) final (higher-res) -> replace preview
     try {
-      console.log('run detection');
+      console.log('Arribo?');
       const finalBlob = await runDetection(inputSource, maxWidthFinal);
       postMessage({ type: 'result', blob: finalBlob });
     } catch (finalErr: any) {
+      console.log('error 1');
       postMessage({ type: 'error', error: finalErr?.message ?? String(finalErr) });
     }
   } catch (err: any) {

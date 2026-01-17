@@ -20,15 +20,9 @@
               {
                 "glob": "**/*",
                 "input": "public"
-              },
-              {
-                "glob": "**/*",
-                "input": "src/app/services",
-                "output": "/services"
               }
             ],
-            "styles": ["src/styles.css"],
-            "allowedCommonJsDependencies": ["onnxruntime-web", "@imgly/background-removal"]
+            "styles": ["src/styles.css"]
           },
           "configurations": {
             "production": {
@@ -55,6 +49,12 @@
           "defaultConfiguration": "production"
         },
         "serve": {
+          "options": {
+            "headers": {
+              "Cross-Origin-Opener-Policy": "same-origin",
+              "Cross-Origin-Embedder-Policy": "require-corp"
+            }
+          },
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
@@ -83,6 +83,11 @@
                 "glob": "**/*",
                 "input": "src/app/services",
                 "output": "/services"
+              },
+              {
+                "glob": "**/*.wasm",
+                "input": "node_modules/onnxruntime-web/dist",
+                "output": "/assets"
               }
             ],
             "styles": ["src/styles.css"]
