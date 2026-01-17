@@ -3,13 +3,14 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from './services/auth.service';
 import { StorageService } from './services/storage.service';
 import { ImagesService, ImageMetadata } from './services/images.service';
+import { RemoveBgPage } from './remove-bg.page';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RemoveBgPage],
   templateUrl: './app.html',
-  styleUrls: ['./app.css']
+  styleUrls: ['./app.css'],
 })
 export class App {
   // Inject services
@@ -19,21 +20,21 @@ export class App {
 
   // Expose user signal for template
   readonly user = this.authService.user;
-  
+
   // Track upload progress
   uploadProgress = signal<number | undefined>(undefined);
   uploadState = signal<string>('');
-  
+
   // Photo preview
   selectedFile: File | null = null;
   previewUrl: string | null = null;
-  
+
   // User's images - automatically loads when user logs in
   readonly images = this.imagesService.getUserImagesSignal();
-  
+
   // Track which images are being deleted
   deletingImages = signal<Set<string>>(new Set());
-  
+
   // Track which images are being edited (imageId -> edited name)
   editingImages = signal<Map<string, string>>(new Map());
 
@@ -57,11 +58,11 @@ export class App {
     // Store file and create preview
     this.selectedFile = file;
     this.previewUrl = URL.createObjectURL(file);
-    
+
     // Reset upload state
     this.uploadState.set('');
     this.uploadProgress.set(undefined);
-    
+
     // Reset file input so same file can be selected again
     event.target.value = '';
   }
@@ -106,11 +107,11 @@ export class App {
       await this.imagesService.createImage({
         name: this.selectedFile.name,
         imageUrl: downloadURL,
-        userId: currentUser.uid
+        userId: currentUser.uid,
       });
 
       this.uploadState.set('Upload Complete!');
-      
+
       // Clear preview after successful upload
       // Images list will automatically refresh via the signal
       this.removePreview();
@@ -140,7 +141,7 @@ export class App {
     }
 
     // Add to deleting set
-    this.deletingImages.update(set => new Set(set).add(image.id!));
+    this.deletingImages.update((set) => new Set(set).add(image.id!));
 
     try {
       // Delete file from Storage using the URL (which contains the original path)
@@ -152,7 +153,7 @@ export class App {
 
       // Images list will automatically refresh via the signal
       this.uploadState.set('Image deleted successfully');
-      
+
       // Clear message after a short delay
       setTimeout(() => {
         this.uploadState.set('');
@@ -161,7 +162,7 @@ export class App {
       this.uploadState.set('Error deleting image: ' + err.message);
     } finally {
       // Remove from deleting set
-      this.deletingImages.update(set => {
+      this.deletingImages.update((set) => {
         const newSet = new Set(set);
         newSet.delete(image.id!);
         return newSet;
@@ -178,7 +179,7 @@ export class App {
   // 5. Edit Logic
   startEditing(image: ImageMetadata): void {
     if (!image.id) return;
-    this.editingImages.update(map => {
+    this.editingImages.update((map) => {
       const newMap = new Map(map);
       newMap.set(image.id!, image.name);
       return newMap;
@@ -187,7 +188,7 @@ export class App {
 
   cancelEditing(imageId: string | undefined): void {
     if (!imageId) return;
-    this.editingImages.update(map => {
+    this.editingImages.update((map) => {
       const newMap = new Map(map);
       newMap.delete(imageId);
       return newMap;
@@ -195,7 +196,7 @@ export class App {
   }
 
   updateEditingName(imageId: string, newName: string): void {
-    this.editingImages.update(map => {
+    this.editingImages.update((map) => {
       const newMap = new Map(map);
       newMap.set(imageId, newName);
       return newMap;
@@ -245,12 +246,12 @@ export class App {
 
     try {
       await this.imagesService.updateImage(image.id, {
-        name: editedName.trim()
+        name: editedName.trim(),
       });
 
       // Images list will automatically refresh via the signal
       this.uploadState.set('Name updated successfully');
-      
+
       // Clear message after a short delay
       setTimeout(() => {
         this.uploadState.set('');
