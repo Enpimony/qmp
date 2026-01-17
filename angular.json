@@ -20,6 +20,11 @@
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "src/app/services",
+                "output": "/services"
               }
             ],
             "styles": ["src/styles.css"],
@@ -73,6 +78,11 @@
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "src/app/services",
+                "output": "/services"
               }
             ],
             "styles": ["src/styles.css"]

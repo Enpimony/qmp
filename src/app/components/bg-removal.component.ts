@@ -108,7 +108,7 @@ export class RemoveBgPage implements OnDestroy {
     this.cleanupWorker();
 
     // create worker and wire messages
-    this.currentWorker = new Worker(new URL('./../services/bg-remove.worker', import.meta.url), {
+    this.currentWorker = new Worker('/services/bg-remove.worker.js', {
       type: 'module',
     });
     this.currentWorker.onmessage = (ev: MessageEvent) => {

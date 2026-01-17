@@ -9,7 +9,7 @@ import { ImagesService, ImageMetadata } from './services/images.service';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './app.html',
-  styleUrls: ['./app.css']
+  styleUrls: ['./app.css'],
 })
 export class App {
   // Inject services
@@ -17,23 +17,29 @@ export class App {
   private storageService = inject(StorageService);
   private imagesService = inject(ImagesService);
 
+  // worker that performs detection
+  private currentWorker: Worker | null = null;
+
+  resultSrc = signal<string | null>(null);
+  processing = signal(false);
+
   // Expose user signal for template
   readonly user = this.authService.user;
-  
+
   // Track upload progress
   uploadProgress = signal<number | undefined>(undefined);
   uploadState = signal<string>('');
-  
+
   // Photo preview
   selectedFile: File | null = null;
   previewUrl: string | null = null;
-  
+
   // User's images - automatically loads when user logs in
   readonly images = this.imagesService.getUserImagesSignal();
-  
+
   // Track which images are being deleted
   deletingImages = signal<Set<string>>(new Set());
-  
+
   // Track which images are being edited (imageId -> edited name)
   editingImages = signal<Map<string, string>>(new Map());
 
@@ -57,11 +63,11 @@ export class App {
     // Store file and create preview
     this.selectedFile = file;
     this.previewUrl = URL.createObjectURL(file);
-    
+
     // Reset upload state
     this.uploadState.set('');
     this.uploadProgress.set(undefined);
-    
+
     // Reset file input so same file can be selected again
     event.target.value = '';
   }
@@ -76,6 +82,127 @@ export class App {
     this.uploadProgress.set(undefined);
   }
 
+  async removeBackground(): Promise<void> {
+    console.log(this.selectedFile);
+    if (!this.selectedFile) return;
+    await this.processFile(this.selectedFile);
+  }
+
+  private revokeUrl(url: string | null) {
+    if (url) {
+      try {
+        URL.revokeObjectURL(url);
+      } catch {
+        // ignore
+      }
+    }
+  }
+
+  async processFile(file: Blob | File) {
+    console.log('process');
+    // stop and cleanup previous worker if any
+    this.cleanupWorker();
+
+    // create worker and wire messages
+    try {
+      // Use absolute path for web workers
+      const workerUrl = '/services/bg-remove.worker.js';
+      console.log('Creating worker with absolute URL:', workerUrl);
+
+      // Test if the worker URL is accessible before creating the worker
+      fetch(workerUrl, { method: 'HEAD' })
+        .then((response) => {
+          console.log(
+            'Worker URL response:',
+            response.status,
+            response.ok,
+            'Content-Type:',
+            response.headers.get('content-type')
+          );
+          if (!response.ok) {
+            throw new Error(`Worker URL not accessible: ${response.status}`);
+          }
+        })
+        .catch((fetchError) => {
+          console.error('Failed to fetch worker URL:', fetchError);
+        });
+
+      this.currentWorker = new Worker(workerUrl, {
+        type: 'module',
+      });
+      console.log('Worker created successfully:', this.currentWorker);
+    } catch (workerError) {
+      console.error('Failed to create worker:', workerError);
+      return;
+    }
+
+    this.currentWorker.onmessage = (ev: MessageEvent) => {
+      console.log('Main thread received message:', ev.data);
+      const data = ev.data;
+      if (data?.type === 'progress') {
+        //this.progress.set(data.progress);
+      } else if (data?.type === 'result') {
+        console.log('Finished');
+        const blob: Blob = data.blob;
+        const url = URL.createObjectURL(blob);
+        this.revokeUrl(this.resultSrc());
+        this.previewUrl = url;
+        this.cleanupWorker();
+        this.processing.set(false);
+        //this.progress.set(null);
+      } else if (data?.type === 'started') {
+        console.log('Starting');
+        // starting
+      } else if (data?.type === 'error') {
+        console.log('Processing error');
+        //this.error.set(data.error || 'Unknown error');
+        this.cleanupWorker();
+        // ensure timer is stopped on error
+        this.processing.set(false);
+      }
+    };
+
+    this.currentWorker.onerror = (error) => {
+      console.error('Worker error details:', {
+        message: error.message,
+        filename: error.filename,
+        lineno: error.lineno,
+        colno: error.colno,
+        error: error.error,
+      });
+      console.error('Full worker error object:', error);
+    };
+
+    // transfer the image data to avoid cloning overhead
+    try {
+      const buffer = await (file as File).arrayBuffer();
+      // send single message asking the worker to run both preview and final
+      console.log('run');
+      this.currentWorker.postMessage(
+        {
+          buffer,
+          type: (file as File).type || 'image/png',
+          maxWidthFinal: 512,
+        },
+        [buffer]
+      );
+      console.log('post message');
+    } catch (err: any) {
+      // fallback: if reading fails, send the file directly (structured clone)
+      this.currentWorker.postMessage({
+        file,
+        type: (file as File).type || 'image/png',
+        maxWidthFinal: 512,
+      } as any);
+    }
+  }
+
+  private cleanupWorker() {
+    if (this.currentWorker) {
+      this.currentWorker.terminate();
+      this.currentWorker = null;
+    }
+  }
   // 3. Upload Logic
   async uploadFile(): Promise<void> {
     if (!this.selectedFile) return;
@@ -106,11 +233,11 @@ export class App {
       await this.imagesService.createImage({
         name: this.selectedFile.name,
         imageUrl: downloadURL,
-        userId: currentUser.uid
+        userId: currentUser.uid,
       });
 
       this.uploadState.set('Upload Complete!');
-      
+
       // Clear preview after successful upload
       // Images list will automatically refresh via the signal
       this.removePreview();
@@ -140,7 +267,7 @@ export class App {
     }
 
     // Add to deleting set
-    this.deletingImages.update(set => new Set(set).add(image.id!));
+    this.deletingImages.update((set) => new Set(set).add(image.id!));
 
     try {
       // Delete file from Storage using the URL (which contains the original path)
@@ -152,7 +279,7 @@ export class App {
 
       // Images list will automatically refresh via the signal
       this.uploadState.set('Image deleted successfully');
-      
+
       // Clear message after a short delay
       setTimeout(() => {
         this.uploadState.set('');
@@ -161,7 +288,7 @@ export class App {
       this.uploadState.set('Error deleting image: ' + err.message);
     } finally {
       // Remove from deleting set
-      this.deletingImages.update(set => {
+      this.deletingImages.update((set) => {
         const newSet = new Set(set);
         newSet.delete(image.id!);
         return newSet;
@@ -178,7 +305,7 @@ export class App {
   // 5. Edit Logic
   startEditing(image: ImageMetadata): void {
     if (!image.id) return;
-    this.editingImages.update(map => {
+    this.editingImages.update((map) => {
       const newMap = new Map(map);
       newMap.set(image.id!, image.name);
       return newMap;
@@ -187,7 +314,7 @@ export class App {
 
   cancelEditing(imageId: string | undefined): void {
     if (!imageId) return;
-    this.editingImages.update(map => {
+    this.editingImages.update((map) => {
       const newMap = new Map(map);
       newMap.delete(imageId);
       return newMap;
@@ -195,7 +322,7 @@ export class App {
   }
 
   updateEditingName(imageId: string, newName: string): void {
-    this.editingImages.update(map => {
+    this.editingImages.update((map) => {
       const newMap = new Map(map);
       newMap.set(imageId, newName);
       return newMap;
@@ -245,12 +372,12 @@ export class App {
 
     try {
       await this.imagesService.updateImage(image.id, {
-        name: editedName.trim()
+        name: editedName.trim(),
       });
 
       // Images list will automatically refresh via the signal
       this.uploadState.set('Name updated successfully');
-      
+
       // Clear message after a short delay
       setTimeout(() => {
         this.uploadState.set('');
