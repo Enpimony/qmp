@@ -1,8 +1,9 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from './services/auth.service';
 import { StorageService } from './services/storage.service';
 import { ImagesService, ImageMetadata } from './services/images.service';
+import { WeatherService, WeatherData } from './services/weather.service';
 
 @Component({
   selector: 'app-root',
@@ -16,6 +17,19 @@ export class App {
   private authService = inject(AuthService);
   private storageService = inject(StorageService);
   private imagesService = inject(ImagesService);
+  private weatherService = inject(WeatherService);
+
+  constructor() {
+    effect(() => {
+      if (this.user() && !this.weatherFetched()) {
+        this.weatherFetched.set(true);
+        this.getWeather();
+      } else if (!this.user()) {
+        this.weatherFetched.set(false);
+        this.weatherData.set(null);
+      }
+    });
+  }
 
   // worker that performs detection
   private currentWorker: Worker | null = null;
@@ -37,6 +51,11 @@ export class App {
   // User's images - automatically loads when user logs in
   readonly images = this.imagesService.getUserImagesSignal();
 
+  // Weather data
+  weatherData = signal<WeatherData | null>(null);
+  loadingWeather = signal(false);
+  weatherFetched = signal(false);
+
   // Track which images are being deleted
   deletingImages = signal<Set<string>>(new Set());
 
@@ -50,6 +69,24 @@ export class App {
 
   async logout(): Promise<void> {
     await this.authService.logout();
+  }
+
+  // Weather logic
+  async getWeather(): Promise<void> {
+    if (this.loadingWeather()) return;
+
+    this.loadingWeather.set(true);
+    try {
+      const location = await this.weatherService.getCurrentLocation();
+      const weather = await this.weatherService.getWeather(location.lat, location.lon).toPromise();
+      if (weather) {
+        this.weatherData.set(weather);
+      }
+    } catch (e) {
+      console.error('Error fetching weather:', e);
+    } finally {
+      this.loadingWeather.set(false);
+    }
   }
 
   // 2. Photo Selection & Preview
