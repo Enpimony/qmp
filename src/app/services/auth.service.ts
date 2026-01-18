@@ -1,13 +1,14 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, NgZone } from '@angular/core';
 import { Auth, GoogleAuthProvider, signInWithPopup, user, User } from '@angular/fire/auth';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
   private auth: Auth = inject(Auth);
+  private ngZone: NgZone = inject(NgZone);
   private _user$ = user(this.auth);
 
   // Observable of the currently logged-in user (for use in pipes)
@@ -20,14 +21,28 @@ export class AuthService {
    * Sign in with Google using popup
    */
   async login(): Promise<void> {
-    await signInWithPopup(this.auth, new GoogleAuthProvider());
+    try {
+      const result = await this.ngZone.run(() =>
+        signInWithPopup(this.auth, new GoogleAuthProvider()),
+      );
+      console.log('Login successful:', result.user.email);
+    } catch (error: any) {
+      // Ignore popup-closed-by-user error as it's expected behavior
+      if (
+        error?.code !== 'auth/popup-closed-by-user' &&
+        error?.code !== 'auth/cancelled-popup-request'
+      ) {
+        console.error('Login error:', error);
+        throw error;
+      }
+    }
   }
 
   /**
    * Sign out the current user
    */
   async logout(): Promise<void> {
-    await this.auth.signOut();
+    await this.ngZone.run(() => this.auth.signOut());
   }
 
   /**
@@ -37,4 +52,3 @@ export class AuthService {
     return this.user()?.uid ?? null;
   }
 }
-
