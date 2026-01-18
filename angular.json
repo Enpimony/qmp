@@ -49,12 +49,6 @@
           "defaultConfiguration": "production"
         },
         "serve": {
-          "options": {
-            "headers": {
-              "Cross-Origin-Opener-Policy": "same-origin",
-              "Cross-Origin-Embedder-Policy": "require-corp"
-            }
-          },
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
