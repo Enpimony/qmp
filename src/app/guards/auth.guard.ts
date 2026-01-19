@@ -14,7 +14,6 @@ export class AuthGuard implements CanActivate {
   ) {}
 
   canActivate(): Observable<boolean> {
-    console.log('wtf');
     return this.authService.user$.pipe(
       take(1), // Ensure we only take the first emitted value
       map((user) => {

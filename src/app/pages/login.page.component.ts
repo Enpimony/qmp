@@ -11,9 +11,9 @@ import { Router } from '@angular/router';
           <div class="logo-container">
             <img src="logo.webp" alt="Kempo Logo" class="logo" />
           </div>
-          <p class="text-center mb-2">Si us plau, inicia sessió per continuar.</p>
+          <p class="text-center mb-2">Please sign in to continue</p>
           <div class="card-actions justify-center">
-            <button class="btn btn-primary" (click)="login()">Entra amb Google</button>
+            <button class="btn btn-primary" (click)="login()">Sign in with Google</button>
           </div>
         </div>
       </div>
