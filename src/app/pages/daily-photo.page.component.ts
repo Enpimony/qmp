@@ -4,14 +4,13 @@ import { AuthService } from '../services/auth.service';
 import { StorageService } from '../services/storage.service';
 import { ImagesService, ImageMetadata } from '../services/images.service';
 import { WeatherService, WeatherData } from '../services/weather.service';
-import { LoginComponent } from '../components/login.component';
 import { LogoutComponent } from '../components/logout.component';
 
 @Component({
   selector: 'app-daily-photo',
   standalone: true,
-  imports: [CommonModule, LoginComponent, LogoutComponent],
-  templateUrl: './daily-photo.component.html',
+  imports: [CommonModule, LogoutComponent],
+  templateUrl: './daily-photo.page.component.html',
 })
 export class DailyPhotoComponent {
   // Inject services

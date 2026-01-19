@@ -26,6 +26,16 @@ export class AuthService {
         signInWithPopup(this.auth, new GoogleAuthProvider()),
       );
       console.log('Login successful:', result.user.email);
+
+      // Wait until the user observable emits the logged-in user
+      await new Promise<void>((resolve) => {
+        const subscription = this._user$.subscribe((user) => {
+          if (user) {
+            subscription.unsubscribe();
+            resolve();
+          }
+        });
+      });
     } catch (error: any) {
       // Ignore popup-closed-by-user error as it's expected behavior
       if (
@@ -43,6 +53,16 @@ export class AuthService {
    */
   async logout(): Promise<void> {
     await this.ngZone.run(() => this.auth.signOut());
+
+    // Wait until the user observable emits null (logged-out state)
+    await new Promise<void>((resolve) => {
+      const subscription = this._user$.subscribe((user) => {
+        if (!user) {
+          subscription.unsubscribe();
+          resolve();
+        }
+      });
+    });
   }
 
   /**
@@ -50,5 +70,12 @@ export class AuthService {
    */
   get currentUserId(): string | null {
     return this.user()?.uid ?? null;
+  }
+
+  /**
+   * Check if the user is authenticated
+   */
+  isAuthenticated(): boolean {
+    return !!this.user();
   }
 }
