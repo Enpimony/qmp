@@ -1,0 +1,84 @@
+<div class="space-y-4">
+  <div class="divider">
+    <h3 class="text-xl font-semibold">My Photos</h3>
+  </div>
+
+  @if (filteredImages(); as images) {
+    @if (images.length === 0) {
+      <div class="text-center py-8">
+        <p class="text-base-content/60">No photos yet. Upload your first photo!</p>
+      </div>
+    } @else {
+      <!-- DaisyUI Carousel with Navigation -->
+      <div class="carousel w-full rounded-box relative">
+        @for (image of images; track image.id; let i = $index) {
+          <div
+            [id]="getCarouselSlideId(i)"
+            class="carousel-item relative w-full"
+          >
+            <div class="card bg-base-200 shadow-md w-full mx-4 cursor-pointer" (click)="openPhotoModal(image)">
+              <figure class="aspect-square overflow-hidden rounded-t-lg">
+                <img
+                  [src]="image.imageUrl"
+                  [alt]="image.name"
+                  class="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+                />
+              </figure>
+              <div class="card-body p-4">
+                <h4 class="card-title text-sm truncate">{{ image.name }}</h4>
+                <p class="text-xs text-base-content/60">
+                  {{ image.createdAt | date: 'short' }}
+                </p>
+              </div>
+            </div>
+            
+            <!-- Navigation Arrows -->
+            @if (images.length > 1) {
+              <div class="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between pointer-events-none">
+                <a
+                  [href]="'#' + getPrevSlideId(i, images.length)"
+                  class="btn btn-circle pointer-events-auto"
+                  (click)="$event.stopPropagation()"
+                >
+                  ❮
+                </a>
+                <a
+                  [href]="'#' + getNextSlideId(i, images.length)"
+                  class="btn btn-circle pointer-events-auto"
+                  (click)="$event.stopPropagation()"
+                >
+                  ❯
+                </a>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Pagination Dots (only show if more than 1 photo) -->
+      @if (images.length > 1) {
+        <div class="flex justify-center gap-2 mt-4">
+          @for (image of images; track image.id; let i = $index) {
+            <a
+              [href]="'#' + getCarouselSlideId(i)"
+              class="btn btn-circle btn-sm"
+              (click)="$event.stopPropagation()"
+            >
+              {{ i + 1 }}
+            </a>
+          }
+        </div>
+      }
+    }
+  }
+
+  <!-- Photo Modal -->
+  <app-photo-modal
+    [image]="selectedImage()"
+    [isOpen]="isModalOpen()"
+    (closed)="closeModal()"
+    (deleted)="onPhotoDeleted($event)"
+    (updated)="onPhotoUpdated($event)"
+  />
+</div>
+

@@ -4,11 +4,12 @@ import { AuthService } from '../../services/auth.service';
 import { StorageService } from '../../services/storage.service';
 import { ImagesService, ImageMetadata } from '../../services/images.service';
 import { WeatherService, WeatherData } from '../../services/weather.service';
+import { MyPhotosComponent } from '../../components/my-photos/my-photos.component';
 
 @Component({
   selector: 'app-daily-photo',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, MyPhotosComponent],
   templateUrl: './daily-photo.page.component.html',
 })
 export class DailyPhotoComponent {

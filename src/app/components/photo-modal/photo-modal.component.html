@@ -1,0 +1,139 @@
+<dialog #modalDialog class="modal">
+    <div class="modal-box max-w-2xl">
+      @if (image(); as currentImage) {
+        <div class="card bg-base-100">
+          <!-- Hover 3D Avatar Image -->
+          <figure class="flex justify-center p-4">
+            <div class="hover-3d">
+              <img
+                [src]="currentImage.imageUrl"
+                [alt]="currentImage.name"
+                class="w-full max-w-md rounded-lg object-cover"
+              />
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+            </div>
+          </figure>
+
+          <!-- Card Body -->
+          <div class="card-body">
+            <h2 class="card-title justify-center mb-4">Photo Details</h2>
+
+            <!-- Name Section -->
+            <div class="space-y-2">
+              <label class="label">
+                <span class="label-text font-semibold">Name</span>
+              </label>
+              @if (isEditing()) {
+                <div class="space-y-2">
+                  <input
+                    type="text"
+                    class="input input-bordered w-full"
+                    [value]="editedName()"
+                    (input)="onNameInput($event)"
+                    (keydown)="onKeyDown($event)"
+                    [disabled]="isUpdating()"
+                    autofocus
+                  />
+                  <div class="flex gap-2">
+                    <button
+                      class="btn btn-success btn-sm flex-1"
+                      (click)="saveName()"
+                      [disabled]="isUpdating() || isDeleting()"
+                    >
+                      @if (isUpdating()) {
+                        <span class="loading loading-spinner loading-xs"></span>
+                        Saving...
+                      } @else {
+                        Save
+                      }
+                    </button>
+                    <button
+                      class="btn btn-ghost btn-sm flex-1"
+                      (click)="cancelEditing()"
+                      [disabled]="isUpdating() || isDeleting()"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              } @else {
+                <div class="flex items-center gap-2">
+                  <p class="flex-1 text-base-content/80">{{ currentImage.name }}</p>
+                  <button
+                    class="btn btn-ghost btn-xs"
+                    (click)="startEditing()"
+                    [disabled]="isDeleting() || isUpdating()"
+                    title="Edit name"
+                  >
+                    ✏️
+                  </button>
+                </div>
+              }
+            </div>
+
+            <!-- Date Section -->
+            <div class="space-y-2">
+              <label class="label">
+                <span class="label-text font-semibold">Date</span>
+              </label>
+              <p class="text-base-content/60">{{ formattedDate() }}</p>
+            </div>
+
+            <!-- Error Message -->
+            @if (errorMessage()) {
+              <div class="alert alert-error">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="stroke-current shrink-0 h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                <span>{{ errorMessage() }}</span>
+              </div>
+            }
+
+            <!-- Action Buttons -->
+            <div class="card-actions justify-end gap-2 mt-4">
+              <button
+                class="btn btn-error"
+                (click)="deletePhoto()"
+                [disabled]="isDeleting() || isUpdating() || isEditing()"
+              >
+                @if (isDeleting()) {
+                  <span class="loading loading-spinner loading-xs"></span>
+                  Deleting...
+                } @else {
+                  Delete
+                }
+              </button>
+              <button
+                class="btn btn-primary"
+                (click)="closeModal()"
+                [disabled]="isDeleting() || isUpdating()"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+    <form method="dialog" class="modal-backdrop" (click)="closeModal()">
+      <button>close</button>
+    </form>
+  </dialog>
+
