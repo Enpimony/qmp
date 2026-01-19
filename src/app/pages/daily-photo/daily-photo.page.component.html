@@ -2,45 +2,32 @@
   <div class="card w-full max-w-lg bg-base-100 shadow-xl">
     <div class="card-body">
       @if (user()) {
-        @if (loadingWeather()) {
-          <div class="text-center">Loading weather...</div>
-        } @else if (weatherData()) {
-          <div
-            class="text-center mb-4 flex flex-row justify-center justify-content-space-evenly gap-6"
-          >
-            <div>
-              Temperature: {{ weatherData()!.current.temperature_2m }}
-              {{ weatherData()!.current_units.temperature_2m }}
-            </div>
-            <div>Humidity: {{ weatherData()!.current.relative_humidity_2m }}%</div>
-            <div>
-              Wind: {{ weatherData()!.current.wind_speed_10m }}
-              {{ weatherData()!.current_units.wind_speed_10m }}
-            </div>
-          </div>
-        }
-      }
-      <h1 class="card-title text-3xl font-bold text-center mb-6">Kempo</h1>
-
-      @if (user()) {
         <div class="space-y-4">
-          <app-logout></app-logout>
-          <h3 class="text-xl font-semibold">Take & Upload Private Photo</h3>
-          <input
-            type="file"
-            class="file-input file-input-bordered w-full"
-            (change)="onFileSelected($event)"
-            accept="image/*"
-            capture="environment"
-          />
-
-          @if (previewUrl) {
-            <div class="mt-5">
+          <h3 class="text-xl font-semibold text-center">It's time to take a photo!</h3>
+          <div
+            class="relative w-full h-128 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer"
+          >
+            <input
+              type="file"
+              class="absolute inset-0 opacity-0 cursor-pointer"
+              (change)="onFileSelected($event)"
+              accept="image/*"
+              capture="environment"
+              #fileInput
+            />
+            @if (previewUrl) {
               <img
                 [src]="previewUrl"
                 alt="Preview"
-                class="max-w-full max-h-96 rounded-lg shadow-lg"
+                class="max-w-full max-h-128 rounded-lg shadow-lg"
               />
+            } @else {
+              <span class="text-gray-500">Click to select a photo</span>
+            }
+          </div>
+
+          @if (previewUrl) {
+            <div class="mt-5">
               <div class="flex gap-2 mt-3">
                 <button class="btn btn-error flex-1" (click)="removePreview()">Remove</button>
                 <button class="btn btn-success flex-1" (click)="uploadFile()">Upload</button>

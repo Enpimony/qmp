@@ -1,15 +1,14 @@
-import { Component, inject, signal, effect } from '@angular/core';
+import { Component, inject, signal, effect, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../services/auth.service';
-import { StorageService } from '../services/storage.service';
-import { ImagesService, ImageMetadata } from '../services/images.service';
-import { WeatherService, WeatherData } from '../services/weather.service';
-import { LogoutComponent } from '../components/logout.component';
+import { AuthService } from '../../services/auth.service';
+import { StorageService } from '../../services/storage.service';
+import { ImagesService, ImageMetadata } from '../../services/images.service';
+import { WeatherService, WeatherData } from '../../services/weather.service';
 
 @Component({
   selector: 'app-daily-photo',
   standalone: true,
-  imports: [CommonModule, LogoutComponent],
+  imports: [CommonModule],
   templateUrl: './daily-photo.page.component.html',
 })
 export class DailyPhotoComponent {
@@ -136,9 +135,12 @@ export class DailyPhotoComponent {
 
     // create worker and wire messages
     try {
-      this.currentWorker = new Worker(new URL('../services/bg-remove.worker', import.meta.url), {
-        type: 'module',
-      });
+      this.currentWorker = new Worker(
+        new URL('../../services/bg-remove.worker.js', import.meta.url),
+        {
+          type: 'module',
+        },
+      );
 
       console.log('Worker created successfully:', this.currentWorker);
     } catch (workerError) {
