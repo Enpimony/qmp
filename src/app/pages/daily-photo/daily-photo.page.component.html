@@ -1,85 +1,81 @@
 <div class="min-h-screen bg-base-200 flex items-center justify-center p-4">
   <div class="card w-full max-w-lg bg-base-100 shadow-xl">
     <div class="card-body">
-      @if (user()) {
-        <div class="space-y-4">
-          <h3 class="text-xl font-semibold text-center">It's time to take a photo!</h3>
-          <div
-            class="relative w-full h-128 border-2 border-dashed border-gray-300 bg-pink-100 rounded-lg flex items-center justify-around cursor-pointer"
-          >
-            <input
-              type="file"
-              class="absolute inset-0 opacity-0 cursor-pointer"
-              (change)="onFileSelected($event)"
-              accept="image/*"
-              capture="environment"
-              #fileInput
-            />
-            @if (previewUrl) {
-              <div class="relative flex">
-                <div class="flex flex-col items-center justify-start bg-pink-100 w-8 mt-4 mr-4">
-                  <button class="p-2 hover:bg-gray-200" title="Tag">
-                    <i class="fas fa-tag text-pink-500 text-xl"></i>
-                  </button>
-                  <button class="p-2 hover:bg-gray-200" title="Color">
-                    <i class="fas fa-palette text-pink-500 text-xl"></i>
-                  </button>
-                  <button class="p-2 hover:bg-gray-200" title="Delete">
-                    <i class="fas fa-trash text-gray-600 text-xl"></i>
-                  </button>
-                </div>
-                <img
-                  [src]="previewUrl"
-                  alt="Preview"
-                  class="max-w-full max-h-128 rounded-xl shadow-lg"
-                />
-              </div>
-            } @else {
-              <i class="fas fa-camera text-pink-500 text-4xl"></i>
-            }
-          </div>
-
-          @if (previewUrl) {
-            <div class="mt-5">
-              <div class="flex gap-2 mt-3">
-                <button class="btn btn-success flex-1" (click)="removeBackground()">
-                  I like it!
+      <div class="space-y-4">
+        <h3 class="text-xl font-semibold text-center">It's time to take a photo!</h3>
+        <div
+          class="relative w-full h-128 border-2 border-dashed border-gray-300 bg-pink-100 rounded-lg flex items-center justify-around cursor-pointer"
+        >
+          <input
+            type="file"
+            class="absolute inset-0 opacity-0 cursor-pointer"
+            (change)="onFileSelected($event)"
+            accept="image/*"
+            capture="environment"
+            #photoInput
+          />
+          @if (previewUrl()) {
+            <div class="relative flex">
+              <div class="flex flex-col items-center justify-start bg-pink-100 w-8 mt-4 mr-4">
+                <button class="p-2 hover:bg-gray-200" title="Tag">
+                  <i class="fas fa-tag text-pink-500 text-xl"></i>
+                </button>
+                <button class="p-2 hover:bg-gray-200" title="Color">
+                  <i class="fas fa-palette text-pink-500 text-xl"></i>
+                </button>
+                <button class="p-2 hover:bg-gray-200" title="Delete">
+                  <i class="fas fa-trash text-gray-600 text-xl"></i>
                 </button>
               </div>
+              <img
+                [src]="previewUrl()"
+                alt="Preview"
+                class="max-w-full max-h-128 rounded-xl shadow-lg"
+              />
             </div>
+          } @else {
+            <i class="fas fa-camera text-pink-500 text-4xl"></i>
           }
-          @if (uploadProgress() !== undefined) {
-            <div class="space-y-2">
-              <progress
-                class="progress progress-primary w-full"
-                [value]="uploadProgress()"
-                max="100"
-              ></progress>
-              <span class="text-sm">{{ uploadProgress() | number: '1.0-0' }}%</span>
-            </div>
-          }
-          @if (uploadState()) {
-            <div class="alert alert-info">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="stroke-current shrink-0 h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <span>{{ uploadState() }}</span>
-            </div>
-          }
-
-          <app-my-photos />
         </div>
-      }
+
+        @if (previewUrl()) {
+          <div class="mt-5">
+            <div class="flex gap-2 mt-3">
+              <button class="btn btn-success flex-1" (click)="processFile()">I like it!</button>
+            </div>
+          </div>
+        }
+        @if (uploadProgress() !== undefined) {
+          <div class="space-y-2">
+            <progress
+              class="progress progress-primary w-full"
+              [value]="uploadProgress()"
+              max="100"
+            ></progress>
+            <span class="text-sm">{{ uploadProgress() | number: '1.0-0' }}%</span>
+          </div>
+        }
+        @if (uploadState()) {
+          <div class="alert alert-info">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="stroke-current shrink-0 h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <span>{{ uploadState() }}</span>
+          </div>
+        }
+
+        <app-my-photos />
+      </div>
     </div>
   </div>
 </div>
