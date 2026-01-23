@@ -26,17 +26,14 @@ export class DailyPhotoComponent {
   uploadProgress = signal<number | undefined>(undefined);
   uploadState = signal<string>('');
 
-  // Photo preview
-  selectedFile: File | null = null;
-
   onFileSelected(event: any) {
     const file = event.target.files[0];
     if (!file) return;
     // Remove previous preview if exists
     this.removePreviousPreview();
 
-    // Store file and create preview
-    this.selectedFile = file;
+    // Store file in the service
+    this.ui.selectedFile = file;
     this.ui.previewUrl.set(URL.createObjectURL(file));
 
     // Reset upload state
@@ -48,15 +45,16 @@ export class DailyPhotoComponent {
   }
 
   removePreviousPreview() {
-    this.selectedFile = null;
+    this.ui.selectedFile = null;
     this.ui.previewUrl.set(null);
     this.uploadState.set('');
     this.uploadProgress.set(undefined);
   }
 
   async processFile(): Promise<void> {
-    if (!this.selectedFile) return;
+    if (!this.ui.selectedFile) return;
     await this.ui.uploadFile();
-    await this.ui.detectBackground(this.selectedFile);
+    await this.ui.detectBackground(this.ui.selectedFile);
+    await this.ui.uploadFile();
   }
 }
