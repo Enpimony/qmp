@@ -1,0 +1,45 @@
+<div class="container">
+    <h2>Wardrobe Analysis</h2>
+  
+    <div class="upload-section">
+      <label for="fileUpload" class="custom-file-upload">
+        <span *ngIf="!isAnalyzing">📸 Select Outfit Photo</span>
+        <span *ngIf="isAnalyzing">Processing...</span>
+      </label>
+      <input 
+        id="fileUpload" 
+        type="file" 
+        (change)="onFileSelected($event)" 
+        accept="image/*" 
+        [disabled]="isAnalyzing"
+      />
+    </div>
+  
+    <div *ngIf="isAnalyzing" class="loading-bar">
+      <div class="spinner"></div>
+      <p>Analyzing image and extracting clothes...</p>
+    </div>
+  
+    <div class="results-grid" *ngIf="processedItems.length > 0">
+      <h3>Identified Items</h3>
+      
+      <div class="grid">
+        <div *ngFor="let item of processedItems" class="card" [class.duplicate]="item.isDuplicate">
+          
+          <div class="image-wrapper">
+            <img [src]="item.displayUrl" [alt]="item.category">
+          </div>
+  
+          <div class="info">
+            <span class="category">{{ item.category | titlecase }}</span>
+            <span class="confidence">{{ item.confidence | percent }} match</span>
+          </div>
+  
+          <div class="status">
+            <span *ngIf="item.isDuplicate" class="badge-dup">⚠️ Existing Item</span>
+            <span *ngIf="!item.isDuplicate" class="badge-new">✅ Saved to DB</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

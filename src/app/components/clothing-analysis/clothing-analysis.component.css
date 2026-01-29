@@ -1,0 +1,86 @@
+.container {
+    max-width: 600px;
+    margin: 2rem auto;
+    text-align: center;
+    font-family: sans-serif;
+  }
+  
+  /* Hide the ugly default file input */
+  input[type="file"] {
+    display: none;
+  }
+  
+  .custom-file-upload {
+    display: inline-block;
+    padding: 12px 24px;
+    background: #3f51b5;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s;
+  }
+  
+  .custom-file-upload:hover {
+    background: #303f9f;
+  }
+  
+  /* Grid Layout for Clothes */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  
+  .card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    padding-bottom: 0.5rem;
+    background: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  
+  .image-wrapper {
+    height: 150px;
+    background: #f9f9f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .image-wrapper img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+  
+  .info {
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    font-size: 0.9rem;
+  }
+  
+  .category {
+    font-weight: bold;
+  }
+  
+  .confidence {
+    font-size: 0.75rem;
+    color: #666;
+  }
+  
+  /* Badges */
+  .badge-new {
+    color: green;
+    font-size: 0.8rem;
+    font-weight: bold;
+  }
+  
+  .badge-dup {
+    color: #d32f2f;
+    font-size: 0.8rem;
+    font-weight: bold;
+  }

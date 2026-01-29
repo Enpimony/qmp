@@ -1,0 +1,30 @@
+<div class="container">
+    <h2>Fashion Analyzer (YOLOv8)</h2>
+  
+    <input type="file" (change)="onFileSelected($event)" accept="image/*">
+    
+    <div *ngIf="isAnalyzing">Loading AI Model & Analyzing... (This may take a moment)</div>
+  
+    <div class="workspace" *ngIf="imageSrc">
+      
+      <div class="main-stage">
+        <h3>Detection View</h3>
+        <canvas #canvasOutput></canvas>
+      </div>
+  
+      <div class="extracted-items">
+        <h3>Found Items</h3>
+        <div class="item-list">
+          <div *ngFor="let item of detectedItems" class="card">
+            <img [src]="item.imageUrl" [alt]="item.label">
+            <div class="info">
+              <strong>{{ item.label }}</strong>
+              <small>{{ item.confidence | percent }} confidence</small>
+              <button (click)="saveItem(item)">Save to DB</button>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+    </div>
+  </div>

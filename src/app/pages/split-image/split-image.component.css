@@ -1,0 +1,60 @@
+.container {
+    padding: 20px;
+  }
+  
+  .workspace {
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+    
+    @media (max-width: 768px) {
+      flex-direction: column;
+    }
+  }
+  
+  .main-stage {
+    flex: 2;
+    border: 1px solid #ccc;
+    padding: 10px;
+    background: #f9f9f9;
+    
+    canvas {
+      max-width: 100%;
+      height: auto;
+    }
+  }
+  
+  .extracted-items {
+    flex: 1;
+    border: 1px solid #ccc;
+    padding: 10px;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  
+  .card {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+  
+    img {
+      width: 60px;
+      height: 60px;
+      object-fit: contain;
+      border: 1px solid #ddd;
+      background: white;
+    }
+  
+    .info {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      
+      button {
+        margin-top: 5px;
+        cursor: pointer;
+      }
+    }
+  }

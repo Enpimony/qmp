@@ -5,11 +5,12 @@ import { StorageService } from '../../services/storage.service';
 import { ImagesService, ImageMetadata } from '../../services/images.service';
 import { MyPhotosComponent } from '../../components/my-photos/my-photos.component';
 import { DailyPhotoUiService } from './daily-photo-ui.service';
+import { ClothingAnalysisComponent } from '../../components/clothing-analysis/clothing-analysis.component';
 
 @Component({
   selector: 'app-daily-photo',
   standalone: true,
-  imports: [CommonModule, MyPhotosComponent],
+  imports: [CommonModule, MyPhotosComponent, ClothingAnalysisComponent],
   templateUrl: './daily-photo.page.component.html',
 })
 export class DailyPhotoComponent {
